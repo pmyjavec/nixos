@@ -3,7 +3,7 @@
 
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, callPackage, ... }: 
+{ config, pkgs, callPackage, ... }:
 
 {
   imports =
@@ -28,11 +28,11 @@
   boot.kernelModules = [ "kvm-intel" ];
 
   # Automatic system upgrades
-  system.autoUpgrade.enable = true; 
+  system.autoUpgrade.enable = true;
 
   networking.hostName = "xps-13"; # Define your hostname.
   networking.networkmanager.enable = true;
-  networking.nameservers = [ "8.8.8.8" "8.8.4.4" ];
+  networking.nameservers = [ "127.0.0.1" ];
   powerManagement.enable = true;
   #networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   #
@@ -64,7 +64,7 @@
      pamixer
      playerctl
      openssl
-     wget 
+     wget
      firefox
      nmap
      git
@@ -76,45 +76,52 @@
      spotify
      slack
      pavucontrol
-     bc 
+     bc
      ipcalc
      pciutils
      update-resolv-conf
      zip
      gnupg
      zoom-us
+     unzip
+     xclip
 
 
      # Development
      tmux
      docker
      (import (fetchTarball "channel:nixos-unstable") {}).neovim
-     (import (fetchTarball "channel:nixos-unstable") {}).terraform
-     
+     #(import (fetchTarball "channel:nixos-unstable") {}).terraform
+     fzf
+
      # Languages
      ruby
+     bundler
      python
      python3
      gcc
      gnumake
+     go
 
      # DevOps and Operational Tooling
-     #terraform
      ansible
      dnsutils
      awscli
      vagrant
      google-cloud-sdk
-     minikube 
+     minikube
+     openvpn
+     saml2aws
+     update-resolv-conf
    ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.bash.enableCompletion = true;
   # programs.mtr.enable = true;
-  programs.gnupg.agent = { 
-	enable = true; 
-	enableSSHSupport = true; 
+  programs.gnupg.agent = {
+	enable = true;
+	enableSSHSupport = true;
 	};
 
   # List services that you want to enable:
@@ -128,14 +135,22 @@
   # networking.firewall.enable = false;
 
   # Enable CUPS to print documents.
-  services.printing.enable = true; 
+  services.printing.enable = true;
   services.avahi.enable = true;
-  services.avahi.nssmdns = true;
+  services.avahi.nssmdns = false;
   services.printing.drivers = [ pkgs.gutenprint ];
 
   # NTP syncing
   services.chrony.enable = true;
 
+  # DNS Cache
+  services.dnscache = {
+    enable = true;
+    domainServers = {
+      "@" = ["208.67.222.222" "208.67.220.220"];
+    };
+    forwardOnly = true;
+  };
 
   # Enable sound.
   sound.enable = true;
@@ -156,7 +171,7 @@
     enable = true;
 
     libinput.enable = true;
-    libinput.naturalScrolling = true;  
+    libinput.naturalScrolling = true;
     libinput.disableWhileTyping = true;
 
     displayManager.sddm.enable = false;
@@ -183,7 +198,7 @@
   # compatible, in order to avoid breaking some software such as database
   # servers. You should change this only after NixOS release notes say you
   # should.
-  system.stateVersion = "19.03"; 
+  system.stateVersion = "19.03";
 
   fonts.fonts = with pkgs; [
     source-code-pro
@@ -195,7 +210,7 @@
   services.redshift = {
     enable = false;
     provider = "geoclue2";
-  }; 
+  };
 
   nixpkgs.config.allowUnfree = true;
 
