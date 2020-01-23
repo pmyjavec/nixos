@@ -16,37 +16,41 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # Grub menu is painted really slowly on HiDPI, so we lower the
+  # resolution. Unfortunately, scaling to 1280x720 (keeping aspect
+  # ratio) doesn't seem to work, so we just pick another low one.
+  boot.loader.grub.gfxmodeEfi = "1024x768";
+
+  # This is required for now to get > 5.4 so the new X1 Xtreme works.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
   # Decrypt root FS
   boot.initrd.luks.devices = [
     {
       name = "root";
-      device = "/dev/nvme0n1p2";
+      device = "/dev/disk/by-uuid/0ebaf0bc-b483-4f50-ab13-3bb0ee016b9d";
       preLVM = true;
     }
   ];
 
-  boot.kernelModules = [ "kvm-intel" ];
-
   # Automatic system upgrades
   system.autoUpgrade.enable = true;
 
-  networking.hostName = "xps-13"; # Define your hostname.
+  networking.hostName = "fuji"; # Define your hostname.
   networking.networkmanager.enable = true;
   networking.nameservers = [ "127.0.0.1" ];
   powerManagement.enable = true;
-  #networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  #
 
    #Select internationalisation properties.
    i18n = {
-     consoleFont = "sun12x22";
      consoleKeyMap = "us";
      defaultLocale = "en_AU.UTF-8";
    };
 
    users.extraUsers.pmyjavec = {
    	createHome = true;
-	extraGroups = ["wheel" "video" "audio" "disk" "networkmanager" "docker"];
+	extraGroups = ["wheel" "video" "audio" "disk" "networkmanager"];
 	group = "users";
 	home = "/home/pmyjavec";
 	isNormalUser = true;
@@ -134,11 +138,11 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-  services.avahi.enable = true;
-  services.avahi.nssmdns = false;
-  services.printing.drivers = [ pkgs.gutenprint ];
+  # Fix intel CPU throttling.
+  services.throttled.enable = true;
+
+  # Think Fan
+  services.thinkfan.enable = true;
 
   # NTP syncing
   services.chrony.enable = true;
@@ -198,7 +202,7 @@
   # compatible, in order to avoid breaking some software such as database
   # servers. You should change this only after NixOS release notes say you
   # should.
-  system.stateVersion = "19.03";
+  system.stateVersion = "19.09";
 
   fonts.fonts = with pkgs; [
     source-code-pro
