@@ -98,6 +98,7 @@
      (import (fetchTarball "channel:nixos-unstable") {}).neovim
      #(import (fetchTarball "channel:nixos-unstable") {}).terraform
      fzf
+     hub
 
      # Languages
      ruby
