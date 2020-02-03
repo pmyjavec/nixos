@@ -13,8 +13,6 @@
       ./vpn.nix
     ];
 
-  fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
-
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -22,7 +20,7 @@
   # Grub menu is painted really slowly on HiDPI, so we lower the
   # resolution. Unfortunately, scaling to 1280x720 (keeping aspect
   # ratio) doesn't seem to work, so we just pick another low one.
-  boot.loader.grub.gfxmodeEfi = "1024x768";
+  boot.loader.grub.gfxmodeEfi = "1024x768x32;1024x768x24;auto";
 
   # This is required for now to get > 5.4 so the new X1 Xtreme works.
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -60,6 +58,11 @@
 	shell = pkgs.zsh;
    };
 
+   # Shell Aliases
+   environment.shellAliases = {
+     nv = "nvim";
+   };
+
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
 
@@ -91,6 +94,7 @@
      zoom-us
      unzip
      xclip
+     binutils
 
 
      # Photography

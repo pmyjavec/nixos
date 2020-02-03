@@ -17,9 +17,12 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
   hardware.firmware = [ pkgs.firmwareLinuxNonfree ];
+
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/3bf45666-424c-4c32-974d-b0bbe8ca0fb2";
+    {
+      device = "/dev/disk/by-uuid/3bf45666-424c-4c32-974d-b0bbe8ca0fb2";
       fsType = "ext4";
+      options = [ "noatime" "nodiratime" "discard" ];
     };
 
   fileSystems."/boot" =
