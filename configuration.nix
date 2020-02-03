@@ -14,6 +14,7 @@
     ];
 
   fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -92,13 +93,17 @@
      xclip
 
 
+     # Photography
+     nomacs
+     gimp
+     exiftool
+
      # Development
      tmux
      docker
-     (import (fetchTarball "channel:nixos-unstable") {}).neovim
-     #(import (fetchTarball "channel:nixos-unstable") {}).terraform
+     neovim
      fzf
-     hub
+     gitAndTools.hub
 
      # Languages
      ruby
@@ -133,6 +138,7 @@
   # List services that you want to enable:
 
   services.keybase.enable = true;
+
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -176,17 +182,21 @@
   services.xserver = {
     enable = true;
 
+    exportConfiguration = true;
     libinput.enable = true;
     libinput.naturalScrolling = true;
     libinput.disableWhileTyping = true;
 
-    displayManager.sddm.enable = false;
+    #videoDrivers = [ "intel" "nvidia" ];
+    videoDrivers = [ "nvidia" ];
+
     xkbOptions = "caps:ctrl_modifier, terminate:ctrl_alt_bksp"; #, altwin:ctrl_win";`
 
     desktopManager = {
       default = "none";
       xterm.enable = false;
     };
+
 
     windowManager.i3 = {
       enable = true;
@@ -211,12 +221,16 @@
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
+    powerline-fonts
+    font-awesome
+    (nerdfonts.override { withFont = "SourceCodePro"; })
    ];
 
   services.redshift = {
     enable = false;
-    provider = "geoclue2";
   };
+
+  location.provider = "geoclue2";
 
   nixpkgs.config.allowUnfree = true;
 
