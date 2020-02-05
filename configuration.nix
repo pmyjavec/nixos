@@ -50,7 +50,7 @@
 
    users.extraUsers.pmyjavec = {
    	createHome = true;
-	extraGroups = ["wheel" "video" "audio" "disk" "networkmanager"];
+	extraGroups = ["wheel" "video" "audio" "disk" "networkmanager" "docker"];
 	group = "users";
 	home = "/home/pmyjavec";
 	isNormalUser = true;
@@ -108,6 +108,9 @@
      neovim
      fzf
      gitAndTools.hub
+     gitAndTools.git-ignore
+     shellcheck
+
 
      # Languages
      ruby
@@ -186,10 +189,10 @@
   services.xserver = {
     enable = true;
 
-    exportConfiguration = true;
     libinput.enable = true;
     libinput.naturalScrolling = true;
     libinput.disableWhileTyping = true;
+    libinput.accelSpeed = "0.6";
 
     #videoDrivers = [ "intel" "nvidia" ];
     videoDrivers = [ "nvidia" ];
