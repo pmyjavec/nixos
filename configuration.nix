@@ -95,6 +95,8 @@
      unzip
      xclip
      binutils
+     lm_sensors
+     gnome3.adwaita-icon-theme # Without this, the cursor size was tiny and had no themses in i3
 
 
      # Photography
@@ -185,35 +187,53 @@
   # Update firmwarre
   services.fwupd.enable = true;
 
-  # Enable touchpad support.
+  # X Server Configuration. There is a bit of trickery in here to get HiDPI
+  # working with i3. Thi stuff can be removed after moving to a more modern WM.
+  environment.variables.XCURSOR_SIZE = "32"; # Trying to get a decent mouse size.
   services.xserver = {
     enable = true;
 
-    libinput.enable = true;
-    libinput.naturalScrolling = true;
-    libinput.disableWhileTyping = true;
-    libinput.accelSpeed = "0.6";
+    libinput = {
+      enable = true;
+      naturalScrolling = true;
+      disableWhileTyping = true;
+      accelSpeed = "0.6";
+    };
 
     #videoDrivers = [ "intel" "nvidia" ];
     videoDrivers = [ "nvidia" ];
 
     xkbOptions = "caps:ctrl_modifier, terminate:ctrl_alt_bksp"; #, altwin:ctrl_win";`
 
+    # Makes things look nicer on a HiDPI screen.
+    dpi=180;
+
     desktopManager = {
       default = "none";
       xterm.enable = false;
     };
 
+    # Fixes small cursor when logging in.
+    displayManager = {
+      lightdm.greeters.gtk.cursorTheme.size = 30;
 
-    windowManager.i3 = {
-      enable = true;
-      package = pkgs.i3-gaps;
-      extraPackages = with pkgs; [
-        dmenu #application launcher most people use
-        i3status # gives you the default i3 status bar
-        i3lock #default i3 screen locker
-        i3blocks #if you are planning on using i3blocks over i3status
-     ];
+      sessionCommands = ''
+        if test -e $HOME/.Xresources; then
+          ${pkgs.xorg.xrdb}/bin/xrdb -merge $HOME/.Xresources &disown
+        fi
+      '';
+    };
+
+    windowManager = {
+      i3 = {
+        enable = true;
+        package = pkgs.i3-gaps;
+        extraPackages = with pkgs; [
+          dmenu #application launcher most people use
+          i3status-rust
+          i3lock #default i3 screen locker
+       ];
+      };
     };
   };
 
@@ -230,6 +250,7 @@
     noto-fonts-emoji
     powerline-fonts
     font-awesome
+    font-awesome_4
     (nerdfonts.override { withFont = "SourceCodePro"; })
    ];
 

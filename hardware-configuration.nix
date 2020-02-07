@@ -44,10 +44,4 @@
   hardware.nvidia.optimus_prime.intelBusId = "PCI:0:2:0";
   hardware.nvidia.modesetting.enable = true;
   hardware.opengl.driSupport32Bit = true;
-
-  hardware.trackpoint = {
-    fakeButtons = true;
-    sensitivity = 200;
-    speed = 110;
-  };
 }
