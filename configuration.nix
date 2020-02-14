@@ -34,6 +34,8 @@
     }
   ];
 
+  nixpkgs.config.allowUnfree = true;
+
   # Automatic system upgrades
   system.autoUpgrade.enable = true;
 
@@ -64,10 +66,14 @@
    };
 
   # Set your time zone.
-  time.timeZone = "Asia/Tokyo";
+  #time.timeZone = "Asia/Tokyo";
+  #time.timeZone = "America/Los_Angeles";
+  time.timeZone = "America/Phoenix";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+
+
    environment.systemPackages = with pkgs; [
      curl
      pamixer
@@ -230,8 +236,9 @@
         package = pkgs.i3-gaps;
         extraPackages = with pkgs; [
           dmenu #application launcher most people use
-          i3status-rust
           i3lock #default i3 screen locker
+          i3status-rust
+          feh
        ];
       };
     };
@@ -259,8 +266,6 @@
   };
 
   location.provider = "geoclue2";
-
-  nixpkgs.config.allowUnfree = true;
 
   programs.ssh.startAgent = false;
   virtualisation.docker.enable = true;
