@@ -63,12 +63,12 @@
    # Shell Aliases
    environment.shellAliases = {
      nv = "nvim";
+     vim = "nvim";
    };
 
   # Set your time zone.
-  #time.timeZone = "Asia/Tokyo";
+  time.timeZone = "Asia/Tokyo";
   #time.timeZone = "America/Los_Angeles";
-  time.timeZone = "America/Phoenix";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -105,6 +105,9 @@
      gnome3.adwaita-icon-theme # Without this, the cursor size was tiny and had no themses in i3
 
 
+     # Games
+     steam
+
      # Photography
      nomacs
      gimp
@@ -115,19 +118,26 @@
      docker
      neovim
      fzf
+     silver-searcher
      gitAndTools.hub
      gitAndTools.git-ignore
      shellcheck
+     jq
+     direnv
+     circleci-cli
 
 
      # Languages
      ruby
      bundler
-     python
      python3
      gcc
      gnumake
      go
+
+     # Python tooling
+     python37Packages.black
+     python37Packages.pylint
 
      # DevOps and Operational Tooling
      ansible
@@ -139,6 +149,7 @@
      openvpn
      saml2aws
      update-resolv-conf
+     postman
    ];
 
   # Some programs need SUID wrappers, can be configured further or are
