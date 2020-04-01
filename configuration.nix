@@ -62,8 +62,9 @@
 
    # Shell Aliases
    environment.shellAliases = {
-     nv = "nvim";
+     nv  = "nvim";
      vim = "nvim";
+     vi  = "nvim";
    };
 
   # Set your time zone.
@@ -86,7 +87,6 @@
      htop
      which
      kitty
-     zsh
      tdesktop
      spotify
      slack
@@ -115,6 +115,7 @@
 
      # Development
      tmux
+     tmuxPlugins.tmux-colors-solarized
      docker
      neovim
      fzf
@@ -131,6 +132,7 @@
      ruby
      bundler
      python3
+     pipenv
      gcc
      gnumake
      go
@@ -165,12 +167,15 @@
 
   services.keybase.enable = true;
 
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  programs.zsh = {
+    enable = true;
+    autosuggestions.enable = true;
+    ohMyZsh.enable = true;
+    ohMyZsh.plugins = [ "git fzf aws vi-mode z" ];
+    ohMyZsh.theme = "spaceship";
+    ohMyZsh.customPkgs = [pkgs.spaceship-prompt pkgs.zsh-powerlevel9k];
+    syntaxHighlighting.enable = true;
+  };
 
   # Fix intel CPU throttling.
   services.throttled.enable = true;
@@ -190,19 +195,23 @@
     forwardOnly = true;
   };
 
+  hardware.bluetooth.enable = true;
   # Enable sound.
   sound.enable = true;
-  hardware.bluetooth.enable = true;
-
   hardware.pulseaudio = {
     enable = true;
     # NixOS allows either a lightweight build (default) or full build of PulseAudio to be installed.
     # Only the full build has Bluetooth support, so it must be selected here.
     package = pkgs.pulseaudioFull;
+    extraModules = [ pkgs.pulseaudio-modules-bt ];
   };
 
   # Update firmwarre
   services.fwupd.enable = true;
+
+  services.logind.extraConfig =  ''
+    RuntimeDirectorySize=40%
+  '';
 
   # X Server Configuration. There is a bit of trickery in here to get HiDPI
   # working with i3. Thi stuff can be removed after moving to a more modern WM.
@@ -250,6 +259,7 @@
           i3lock #default i3 screen locker
           i3status-rust
           feh
+          scrot
        ];
       };
     };
