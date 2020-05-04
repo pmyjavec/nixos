@@ -22,17 +22,15 @@
   # ratio) doesn't seem to work, so we just pick another low one.
   boot.loader.grub.gfxmodeEfi = "1024x768x32;1024x768x24;auto";
 
-  # This is required for now to get > 5.4 so the new X1 Xtreme works.
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
   # Decrypt root FS
-  boot.initrd.luks.devices = [
-    {
-      name = "root";
+  #boot.initrd.luks.fido2Support = true
+  boot.initrd.luks.devices = {
+    luksroot = {
       device = "/dev/disk/by-uuid/0ebaf0bc-b483-4f50-ab13-3bb0ee016b9d";
       preLVM = true;
-    }
-  ];
+    };
+  };
 
   nixpkgs.config.allowUnfree = true;
 
@@ -44,11 +42,13 @@
   networking.nameservers = [ "127.0.0.1" ];
   powerManagement.enable = true;
 
+  #networking.hosts = {
+  #  "127.0.0.1" = [ "officestg.linuxfound.info" "office.linuxfoundation.org" ];
+  #};
+
+
    #Select internationalisation properties.
-   i18n = {
-     consoleKeyMap = "us";
-     defaultLocale = "en_AU.UTF-8";
-   };
+   console.keyMap = "us";
 
    users.extraUsers.pmyjavec = {
    	createHome = true;
@@ -67,6 +67,15 @@
      vi  = "nvim";
    };
 
+     # Fix font sizes in X
+  fonts.fontconfig.dpi = 192;
+
+  # Fix sizes of GTK/GNOME ui elements
+  environment.variables = {
+    GDK_SCALE = "2";
+    GDK_DPI_SCALE= "0.5";
+  };
+
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
   #time.timeZone = "America/Los_Angeles";
@@ -74,8 +83,12 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
 
-
-   environment.systemPackages = with pkgs; [
+  environment.systemPackages = let
+  myPythonPackages = pythonPackages: with pythonPackages; [
+     virtualenv
+  ];
+  in with pkgs; [
+     (python3.withPackages myPythonPackages)
      curl
      pamixer
      playerctl
@@ -102,11 +115,10 @@
      xclip
      binutils
      lm_sensors
-     gnome3.adwaita-icon-theme # Without this, the cursor size was tiny and had no themses in i3
 
 
      # Games
-     steam
+     #steam
 
      # Photography
      nomacs
@@ -121,25 +133,26 @@
      fzf
      silver-searcher
      gitAndTools.hub
+     gitAndTools.pre-commit
      gitAndTools.git-ignore
      shellcheck
      jq
      direnv
      circleci-cli
 
+     #1337
+     nmap
+     tcpdump
+     wireshark
 
      # Languages
      ruby
      bundler
-     python3
      pipenv
      gcc
      gnumake
      go
-
-     # Python tooling
-     python37Packages.black
-     python37Packages.pylint
+     ctags
 
      # DevOps and Operational Tooling
      ansible
@@ -169,9 +182,13 @@
 
   programs.zsh = {
     enable = true;
-    autosuggestions.enable = true;
+    autosuggestions.enable = false;
+    #TODO(pmyjavec) Remove disgusting hack below when the new oh-my-zsh is out.
+    interactiveShellInit = ''
+      export FZF_BASE="/home/pmyjavec/.vim/plugged/fzf/"
+    '';
     ohMyZsh.enable = true;
-    ohMyZsh.plugins = [ "git fzf aws vi-mode z" ];
+    ohMyZsh.plugins = [ "git aws vi-mode z fzf" ];
     ohMyZsh.theme = "spaceship";
     ohMyZsh.customPkgs = [pkgs.spaceship-prompt pkgs.zsh-powerlevel9k];
     syntaxHighlighting.enable = true;
@@ -179,6 +196,12 @@
 
   # Fix intel CPU throttling.
   services.throttled.enable = true;
+
+  # Gnome keyring
+  services.gnome3.gnome-keyring.enable = true;
+
+  #Autorandr - monitor layout config
+  services.autorandr.enable = true;
 
   # Think Fan
   services.thinkfan.enable = true;
@@ -218,6 +241,7 @@
   environment.variables.XCURSOR_SIZE = "32"; # Trying to get a decent mouse size.
   services.xserver = {
     enable = true;
+    exportConfiguration = true;
 
     libinput = {
       enable = true;
@@ -232,16 +256,17 @@
     xkbOptions = "caps:ctrl_modifier, terminate:ctrl_alt_bksp"; #, altwin:ctrl_win";`
 
     # Makes things look nicer on a HiDPI screen.
-    dpi=180;
+    dpi=196;
 
     desktopManager = {
-      default = "none";
       xterm.enable = false;
     };
 
     # Fixes small cursor when logging in.
     displayManager = {
       lightdm.greeters.gtk.cursorTheme.size = 30;
+
+      defaultSession = "none+i3";
 
       sessionCommands = ''
         if test -e $HOME/.Xresources; then
@@ -260,6 +285,7 @@
           i3status-rust
           feh
           scrot
+          pasystray # pulseaudio systay
        ];
       };
     };

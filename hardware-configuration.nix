@@ -37,7 +37,7 @@
 
   nix.maxJobs = lib.mkDefault 12;
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-  i18n.consoleFont = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
+  console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
 
   hardware.nvidia.optimus_prime.enable = true;
   hardware.nvidia.optimus_prime.nvidiaBusId = "PCI:1:0:0";
