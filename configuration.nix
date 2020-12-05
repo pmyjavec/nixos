@@ -2,7 +2,6 @@
 # your system.  Help is available in the configuration.nix(5) man page
 
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, callPackage, ... }:
 
 {
@@ -21,6 +20,9 @@
   # resolution. Unfortunately, scaling to 1280x720 (keeping aspect
   # ratio) doesn't seem to work, so we just pick another low one.
   boot.loader.grub.gfxmodeEfi = "1024x768x32;1024x768x24;auto";
+
+  # Stops the bootloader from filling up.
+  boot.loader.grub.configurationLimit = 5;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
   # Decrypt root FS
@@ -41,11 +43,6 @@
   networking.networkmanager.enable = true;
   networking.nameservers = [ "127.0.0.1" ];
   powerManagement.enable = true;
-
-  #networking.hosts = {
-  #  "127.0.0.1" = [ "officestg.linuxfound.info" "office.linuxfoundation.org" ];
-  #};
-
 
    #Select internationalisation properties.
    console.keyMap = "us";
@@ -70,10 +67,20 @@
      # Fix font sizes in X
   fonts.fontconfig.dpi = 192;
 
+  # Japanese support
+  i18n.inputMethod.enabled = "fcitx";
+  i18n.inputMethod.fcitx.engines = with pkgs.fcitx-engines; [ mozc ];
+
   # Fix sizes of GTK/GNOME ui elements
   environment.variables = {
     GDK_SCALE = "2";
     GDK_DPI_SCALE= "0.5";
+
+    # Enable support for Japanese in X via fcitx.
+    #XMODIFIERS="@im=fcitx";
+    #XMODIFIER="@im=fcitx";
+    # GTK_IM_MODULE="fcitx";
+    # QT_IM_MODULE="fcitx";
   };
 
   # Set your time zone.
@@ -85,10 +92,18 @@
 
   environment.systemPackages = let
   myPythonPackages = pythonPackages: with pythonPackages; [
+     pip
+     setuptools
      virtualenv
+     pre-commit
+     boto3
+     botocore
+     ansible
+     black
+
   ];
   in with pkgs; [
-     (python3.withPackages myPythonPackages)
+     (python38.withPackages myPythonPackages)
      curl
      pamixer
      playerctl
@@ -96,7 +111,6 @@
      wget
      firefox
      nmap
-     git
      htop
      which
      kitty
@@ -115,6 +129,7 @@
      xclip
      binutils
      lm_sensors
+     tree
 
 
      # Games
@@ -133,6 +148,7 @@
      fzf
      silver-searcher
      gitAndTools.hub
+     gitAndTools.gitFull
      gitAndTools.pre-commit
      gitAndTools.git-ignore
      shellcheck
@@ -148,14 +164,14 @@
      # Languages
      ruby
      bundler
-     pipenv
+     #pipenv
      gcc
      gnumake
      go
      ctags
 
      # DevOps and Operational Tooling
-     ansible
+     #ansible
      dnsutils
      awscli
      vagrant
@@ -174,11 +190,12 @@
   programs.gnupg.agent = {
 	enable = true;
 	enableSSHSupport = true;
+    pinentryFlavor = "gtk2";
 	};
 
   # List services that you want to enable:
 
-  services.keybase.enable = true;
+  services.keybase.enable = false;
 
   programs.zsh = {
     enable = true;
@@ -188,9 +205,9 @@
       export FZF_BASE="/home/pmyjavec/.vim/plugged/fzf/"
     '';
     ohMyZsh.enable = true;
-    ohMyZsh.plugins = [ "git aws vi-mode z fzf" ];
+    ohMyZsh.plugins = [ "git gitfast aws vi-mode z fzf" ];
     ohMyZsh.theme = "spaceship";
-    ohMyZsh.customPkgs = [pkgs.spaceship-prompt pkgs.zsh-powerlevel9k];
+    ohMyZsh.customPkgs = [pkgs.spaceship-prompt pkgs.zsh-powerlevel9k pkgs.fzf];
     syntaxHighlighting.enable = true;
   };
 
@@ -213,7 +230,7 @@
   services.dnscache = {
     enable = true;
     domainServers = {
-      "@" = ["208.67.222.222" "208.67.220.220"];
+      "@" = ["8.8.88" "8.8.4.4"];
     };
     forwardOnly = true;
   };
@@ -238,7 +255,7 @@
 
   # X Server Configuration. There is a bit of trickery in here to get HiDPI
   # working with i3. Thi stuff can be removed after moving to a more modern WM.
-  environment.variables.XCURSOR_SIZE = "32"; # Trying to get a decent mouse size.
+  environment.variables.XCURSOR_SIZE = "38"; # Trying to get a decent mouse size.
   services.xserver = {
     enable = true;
     exportConfiguration = true;
@@ -305,7 +322,7 @@
     powerline-fonts
     font-awesome
     font-awesome_4
-    (nerdfonts.override { withFont = "SourceCodePro"; })
+    #(nerdfonts.override { withFont = "SourceCodePro"; })
    ];
 
   services.redshift = {

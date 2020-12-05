@@ -16,6 +16,7 @@
   boot.initrd.kernelModules = [ "dm-snapshot" ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
+  boot.kernelParams = [ "msr.allow_writes=on" ];
   hardware.firmware = [ pkgs.firmwareLinuxNonfree ];
 
   fileSystems."/" =
@@ -39,9 +40,10 @@
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
 
-  hardware.nvidia.optimus_prime.enable = true;
-  hardware.nvidia.optimus_prime.nvidiaBusId = "PCI:1:0:0";
-  hardware.nvidia.optimus_prime.intelBusId = "PCI:0:2:0";
+  hardware.nvidia.prime.sync.enable = true;
+  hardware.nvidia.prime.offload.enable = false;
+  hardware.nvidia.prime.nvidiaBusId = "PCI:1:0:0";
+  hardware.nvidia.prime.intelBusId = "PCI:0:2:0";
   hardware.nvidia.modesetting.enable = true;
   hardware.opengl.driSupport32Bit = true;
 }
